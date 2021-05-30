@@ -1,27 +1,19 @@
-"""config URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/3.2/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
 from django.contrib import admin
 from django.urls import path
-from django.views.generic.base import TemplateView
+
+from vacancies.views import DetailCompanyView, DetailVacancyView
+from vacancies.views import ListVacanciesView, ListVacanciesBySpecialtyView
+from vacancies.views import custom_handler404, custom_handler500
+from vacancies.views import main_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('', TemplateView.as_view(template_name="vacancies/index.html")),
-    path('vacancies/', TemplateView.as_view(template_name="vacancies/vacancies.html")),
-    path('vacancies/cat/frontend', TemplateView.as_view(template_name="vacancies/vacancies.html")),
-    path('vacancies/<int:pk>', TemplateView.as_view(template_name="vacancies/vacancy.html")),
-    path('companies/<int:pk>', TemplateView.as_view(template_name="vacancies/company.html")),
+    path('', main_view, name='home'),
+    path('vacancies/', ListVacanciesView.as_view(), name='all_vacancies'),
+    path('vacancies/cat/<specialty>', ListVacanciesBySpecialtyView.as_view(), name='vacancies_by_speciality'),
+    path('vacancies/<int:pk>', DetailVacancyView.as_view(), name='vacancy'),
+    path('companies/<int:pk>', DetailCompanyView.as_view(), name='company'),
 ]
+
+handler404 = custom_handler404
+handler500 = custom_handler500
