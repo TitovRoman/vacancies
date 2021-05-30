@@ -1,5 +1,6 @@
 from django.db.models import Count
 from django.http import HttpResponseNotFound, HttpResponseServerError
+from django.shortcuts import get_object_or_404
 from django.views.generic import ListView, DetailView, TemplateView
 
 from vacancies.models import Company, Specialty, Vacancy
@@ -16,13 +17,23 @@ class MainView(TemplateView):
         return context
 
 
-class DetailCompanyView(DetailView):
-    model = Company
-    context_object_name = 'company'
+class ListVacanciesByCompanyView(ListView):
+    model = Vacancy
+    context_object_name = 'vacancies'
     template_name = 'vacancies/company.html'
 
     def get_queryset(self):
-        return self.model.objects.prefetch_related('vacancies', 'vacancies__specialty')
+        return (
+            self.model.objects
+            .filter(company__id=self.kwargs['pk'])
+            .select_related('specialty', 'company')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['company'] = get_object_or_404(Company, id=self.kwargs['pk'])
+
+        return context
 
 
 class DetailVacancyView(DetailView):

@@ -1,4 +1,6 @@
+from django.core.exceptions import ValidationError
 from django.db import models
+from django.utils.translation import gettext_lazy as _
 
 
 class Company(models.Model):
@@ -45,3 +47,10 @@ class Vacancy(models.Model):
 
     def __str__(self):
         return f"Vacancy with pk={self.pk}"
+
+    def clean(self):
+        if self.salary_min > self.salary_max:
+            raise ValidationError({
+                'salary_min': _('salary_min must be less or equal to salary_max'),
+                'salary_max': _('salary_max must be greater or equal to salary_min'),
+            })
