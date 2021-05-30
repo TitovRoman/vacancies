@@ -9,17 +9,8 @@ django.setup()
 
 from vacancies.models import Company, Specialty, Vacancy
 
-if __name__ == '__main__':
-    companies = {}
-    for company in data.companies:
-        companies[company['id']] = Company.objects.create(
-            name=company['title'],
-            location=company['location'],
-            logo=company['logo'],
-            description=company['description'],
-            employee_count=company['employee_count'],
-        )
 
+def import_specialities_to_db():
     specialty_images = {
         'frontend': 'specty_frontend.png',
         'backend': 'specty_backend.png',
@@ -41,14 +32,31 @@ if __name__ == '__main__':
             pass
         specialty_obj.save()
 
+
+def import_companies_and_jobs_to_db():
+    companies = {}
+    for company in data.companies:
+        companies[company['id']] = Company.objects.create(
+            name=company['title'],
+            location=company['location'],
+            logo=company['logo'],
+            description=company['description'],
+            employee_count=company['employee_count'],
+        )
+
     for job in data.jobs:
         Vacancy.objects.create(
             title=job['title'],
             specialty=Specialty.objects.get(code=job['specialty']),
             company=companies[job['company']],
-            skills=job['skills'],
+            skills=job['skills'].replace(',', ' •'),
             description=job['description'],
             salary_min=job['salary_from'],
             salary_max=job['salary_to'],
             published_at=job['posted'],
         )
+
+
+if __name__ == '__main__':
+    import_specialities_to_db()
+    import_companies_and_jobs_to_db()
