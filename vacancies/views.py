@@ -1,6 +1,5 @@
 from django.db.models import Count
 from django.http import HttpResponseNotFound, HttpResponseServerError
-from django.shortcuts import render
 from django.views.generic import ListView, DetailView, TemplateView
 
 from vacancies.models import Company, Specialty, Vacancy

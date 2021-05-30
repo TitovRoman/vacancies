@@ -1,5 +1,6 @@
 {% extends "./base.html" %}
 {% load static %}
+{% load ru_pluralize %}
 {% block title %}Вакансия | Джуманджи{% endblock title %}
 {% block content %}
   <div class="pb-5">
@@ -17,7 +18,7 @@
             <p class="m-0 pl-3">{{ vacancy.salary_min }} – {{ vacancy.salary_max }} Р</p>
           </div>
           <p class="mt-2">{{ vacancy.skills }}</p>
-          <p class="text-muted mb-4">{{ vacancy.company.name }} ({{ vacancy.company.employee_count }} человек), {{ vacancy.company.location }} или удаленно</p>
+          <p class="text-muted mb-4">{{ vacancy.company.name }} ({{ vacancy.company.employee_count|ru_pluralize:'человек, человека, человек' }}), {{ vacancy.company.location }} или удаленно</p>
           <div style="line-height: 1.8;">
             {{ vacancy.description|safe }}
           </div>

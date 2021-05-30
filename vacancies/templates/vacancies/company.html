@@ -1,5 +1,6 @@
 {% extends "./base.html" %}
 {% load static %}
+{% load ru_pluralize %}
 {% block title %}Компания | Джуманджи{% endblock title %}
 {% block content %}
 <div class="navbar mt-5">
@@ -10,7 +11,7 @@
     <img src="{{ company.logo }}" width="130" height="80" alt="">
   </div>
   <h1 class="h1 text-center mx-auto mt-0 pt-1" style="font-size: 70px;"><strong>{{ company.name }}</strong></h1>
-  <p class="text-center pt-1">Компания, {{ company.location }}, {{ company.vacancies.count }} вакансий</p>
+  <p class="text-center pt-1">Компания, {{ company.location }}, {{ company.vacancies.count|ru_pluralize:'вакансия, вакансии, вакансий' }}</p>
   <div class="row mt-5">
       <div class="col-12 col-lg-8 offset-lg-2 m-auto">
       {% load i18n %}
