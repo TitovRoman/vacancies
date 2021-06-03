@@ -1,3 +1,5 @@
+from django.conf import settings
+from django.conf.urls.static import static
 from django.contrib import admin
 from django.urls import path
 
@@ -14,6 +16,10 @@ urlpatterns = [
     path('vacancies/<int:pk>', DetailVacancyView.as_view(), name='vacancy'),
     path('companies/<int:pk>', ListVacanciesByCompanyView.as_view(), name='company'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL,
+                          document_root=settings.MEDIA_ROOT)
 
 handler404 = custom_handler404
 handler500 = custom_handler500
