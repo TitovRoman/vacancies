@@ -1,3 +1,4 @@
+from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
@@ -6,9 +7,10 @@ from django.utils.translation import gettext_lazy as _
 class Company(models.Model):
     name = models.CharField(max_length=64)
     location = models.CharField(max_length=64)
-    logo = models.URLField(default='https://place-hold.it/100x60')
+    logo = models.ImageField(upload_to=settings.MEDIA_COMPANY_IMAGE_DIR)
     description = models.TextField()
     employee_count = models.IntegerField()
+    owner = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
 
     class Meta:
         verbose_name = 'Компания'
@@ -21,7 +23,7 @@ class Company(models.Model):
 class Specialty(models.Model):
     code = models.CharField(max_length=64, unique=True)
     title = models.CharField(max_length=64)
-    picture = models.URLField(default='https://place-hold.it/100x60')
+    picture = models.ImageField(upload_to=settings.MEDIA_SPECIALITY_IMAGE_DIR)
 
     class Meta:
         verbose_name = 'Специализация'
@@ -54,3 +56,19 @@ class Vacancy(models.Model):
                 'salary_min': _('salary_min must be less or equal to salary_max'),
                 'salary_max': _('salary_max must be greater or equal to salary_min'),
             })
+
+
+class Application(models.Model):
+    written_username = models.CharField(max_length=64)
+    written_number = models.CharField(max_length=32)
+    written_cover_letter = models.TextField()
+    vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='applications')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='applications')
+
+    class Meta:
+        verbose_name = 'Отклик'
+        verbose_name_plural = 'Отклики'
+
+    def __str__(self):
+        return f"Application with pk={self.pk}"
+
