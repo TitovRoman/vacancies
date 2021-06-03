@@ -12,12 +12,13 @@
       </div>
       <div class="col-12 col-lg-8">
         <section class="pl-3">
-          <a href="{% url 'company' vacancy.company.id %}"><img src="{{ vacancy.company.logo }}" alt=""></a>
+          <a href="{% url 'company' vacancy.company.id %}"><img src="{{ vacancy.company.logo.url }}" width="130" height="80" alt="{{ vacancy.company.name }}"></a>
+          <a href="{% url 'vacancies_by_speciality' vacancy.specialty.code %}"><img src="{{ vacancy.specialty.picture.url }}" width="50" height="50" alt="{{ vacancy.specialty.title }}"></a>
           <div class="d-flex align-items-baseline align-content-baseline">
             <h1 class="h2 mt-4 font-weight-bold" >{{ vacancy.title }}</h1>
             <p class="m-0 pl-3">{{ vacancy.salary_min }} – {{ vacancy.salary_max }} Р</p>
           </div>
-          <p class="mt-2">{{ vacancy.skills }}</p>
+          <p class="mt-2">{{ vacancy.specialty.title }} • {{ vacancy.skills }}</p>
           <p class="text-muted mb-4">{{ vacancy.company.name }} ({{ vacancy.company.employee_count|ru_pluralize:'человек, человека, человек' }}), {{ vacancy.company.location }} или удаленно</p>
           <div style="line-height: 1.8;">
             {{ vacancy.description|safe }}

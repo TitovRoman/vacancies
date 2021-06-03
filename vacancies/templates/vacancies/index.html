@@ -30,13 +30,15 @@
       <h2 class="h2 font-weight-normal text-center mb-5">Вакансии по рубрикам</h2>
       <div class="row mb-0">
           {% for speciality in specialties %}
-            {% url 'company' company.id as company_url %}
+            {% url 'vacancies_by_speciality' speciality.code as speciality_url %}
             <div class="col-6 col-md-6 col-lg-3">
               <div class="card pt-4 text-center mb-4">
-                <img class="mx-auto d-block" src="{{ speciality.picture }}" alt="">
+                <a href="{{ speciality_url }}" style="max-width: 150px;" class="mx-auto d-block">
+                  <img class="mx-auto d-block" src="{{ speciality.picture.url }}" width="80" height="80" alt="{{ speciality.title }}">
+                </a>
                 <div class="card-body">
                   <p class="card-text mb-2">{{ speciality.title }}</p>
-                  <p class="card-text"><a href="{% url 'vacancies_by_speciality' speciality.code %}">{{ speciality.count|ru_pluralize:'вакансия, вакансии, вакансий' }}</a></p>
+                  <p class="card-text"><a href="{{ speciality_url }}">{{ speciality.count|ru_pluralize:'вакансия, вакансии, вакансий' }}</a></p>
                 </div>
               </div>
             </div>
@@ -52,7 +54,7 @@
             <div class="col-6 col-md-6 col-lg-3">
               <div class="card pt-4 text-center mb-4">
                 <a href="{{ company_url }}" style="max-width: 150px;" class="mx-auto d-block">
-                  <img class="mx-auto d-block mw-100" src="{{ company.logo }}" alt="">
+                  <img class="mx-auto d-block mw-100" src="{{ company.logo.url }}" width="150" alt="{{ company.name }}">
                 </a>
                 <div class="card-body">
                   <p class="card-text"><a href="{{ company_url }}">{{ company.count|ru_pluralize:'вакансия, вакансии, вакансий' }}</a></p>
