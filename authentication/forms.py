@@ -1,23 +1,10 @@
-from django.shortcuts import render
-from .forms import MyUserCreationForm
-from django.contrib.auth.views import LoginView
-from django.views.generic import CreateView
-
+from django.contrib.auth.forms import UserCreationForm
 from django.urls import reverse
 from crispy_forms.helper import FormHelper
 from crispy_forms.layout import Submit, Layout, Div, HTML, Fieldset
 from crispy_forms.bootstrap import PrependedText, AppendedText, FormActions
 
-class MyRegisterView(CreateView):
-   form_class = MyUserCreationForm
-   success_url = 'login'
-   template_name = './authentication/register.html'
-
-
-class MyLoginView(LoginView):
-    redirect_authenticated_user = True
-    template_name = './authentication/login.html'
-
+class MyUserCreationForm(UserCreationForm):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 
@@ -31,6 +18,6 @@ class MyLoginView(LoginView):
             <p class="h5 font-weight-light">Создайте аккаунт</p>'''), css_class='text-center mt-5 b-1'
             ),
             AppendedText('username', ''),
-            AppendedText('password', ''),
+            AppendedText('password1', ''),
+            AppendedText('password2', ''),
         )
-
