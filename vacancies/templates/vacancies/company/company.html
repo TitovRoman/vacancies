@@ -1,5 +1,4 @@
-{% extends "./base.html" %}
-{% load static %}
+{% extends "../base/base.html" %}
 {% load ru_pluralize %}
 {% block title %}Компания | Джуманджи{% endblock title %}
 {% block content %}
@@ -17,7 +16,7 @@
       {% load i18n %}
         {% language 'ru' %}
           {% for vacancy in vacancies %}
-              {% include './vacancy_card.html' %}
+              {% include '../vacancy/vacancy_card.html' %}
           {% endfor %}
         {% endlanguage %}
       </div>

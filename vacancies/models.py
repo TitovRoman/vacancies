@@ -35,8 +35,8 @@ class Specialty(models.Model):
 
 class Vacancy(models.Model):
     title = models.CharField(max_length=64)
-    specialty = models.ForeignKey(Specialty, on_delete=models.CASCADE, related_name='vacancies')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='vacancies')
+    specialty = models.ForeignKey(Specialty, on_delete=models.CASCADE, related_name='vacancy')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='vacancy')
     skills = models.TextField()
     description = models.TextField()
     salary_min = models.IntegerField()

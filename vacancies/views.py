@@ -11,8 +11,8 @@ class MainView(TemplateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['specialties'] = Specialty.objects.annotate(count=Count('vacancies')).order_by('id')
-        context['companies'] = Company.objects.annotate(count=Count('vacancies')).order_by('id')
+        context['specialties'] = Specialty.objects.annotate(count=Count('vacancy')).order_by('id')
+        context['companies'] = Company.objects.annotate(count=Count('vacancy')).order_by('id')
 
         return context
 
@@ -20,7 +20,7 @@ class MainView(TemplateView):
 class ListVacanciesByCompanyView(ListView):
     model = Vacancy
     context_object_name = 'vacancies'
-    template_name = 'vacancies/company.html'
+    template_name = 'vacancies/company/company.html'
 
     def get_queryset(self):
         return (
@@ -39,14 +39,14 @@ class ListVacanciesByCompanyView(ListView):
 class DetailVacancyView(DetailView):
     model = Vacancy
     context_object_name = 'vacancy'
-    template_name = 'vacancies/vacancy.html'
+    template_name = 'vacancies/vacancy/vacancy.html'
     queryset = model.objects.select_related('specialty', 'company')
 
 
 class ListVacanciesView(ListView):
     model = Vacancy
     context_object_name = 'vacancies'
-    template_name = 'vacancies/vacancies.html'
+    template_name = 'vacancies/vacancy/vacancies.html'
     queryset = model.objects.select_related('specialty', 'company')
 
     def get_context_data(self, **kwargs):
@@ -59,7 +59,7 @@ class ListVacanciesView(ListView):
 class ListVacanciesBySpecialtyView(ListView):
     model = Vacancy
     context_object_name = 'vacancies'
-    template_name = 'vacancies/vacancies.html'
+    template_name = 'vacancies/vacancy/vacancies.html'
 
     def get_queryset(self):
         return (

@@ -51,9 +51,9 @@ class Migration(migrations.Migration):
                 ('salary_max', models.IntegerField()),
                 ('published_at', models.DateField()),
                 ('company', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
-                                              related_name='vacancies', to='vacancies.company')),
+                                              related_name='vacancy', to='vacancy.company')),
                 ('specialty', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE,
-                                                related_name='vacancies', to='vacancies.specialty')),
+                                                related_name='vacancy', to='vacancy.specialty')),
             ],
             options={
                 'verbose_name': 'Вакансия',

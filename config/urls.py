@@ -11,9 +11,9 @@ from vacancies.views import custom_handler404, custom_handler500
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', MainView.as_view(), name='home'),
-    path('vacancies/', ListVacanciesView.as_view(), name='all_vacancies'),
-    path('vacancies/cat/<specialty>', ListVacanciesBySpecialtyView.as_view(), name='vacancies_by_speciality'),
-    path('vacancies/<int:pk>', DetailVacancyView.as_view(), name='vacancy'),
+    path('vacancy/', ListVacanciesView.as_view(), name='all_vacancies'),
+    path('vacancy/cat/<specialty>', ListVacanciesBySpecialtyView.as_view(), name='vacancies_by_speciality'),
+    path('vacancy/<int:pk>', DetailVacancyView.as_view(), name='vacancy'),
     path('companies/<int:pk>', ListVacanciesByCompanyView.as_view(), name='company'),
 ]
 
