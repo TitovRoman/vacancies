@@ -5,10 +5,12 @@ from django.urls import path
 from django.contrib.auth.views import LogoutView
 
 from authentication.views import MyRegisterView, MyLoginView
-from vacancies.views import ListVacanciesByCompanyView, DetailVacancyView
+from vacancies.views import ListVacanciesByCompanyView, DetailVacancyView, MyCompanyUpdateView, MyCompanyCreateView, \
+    MyCompanyLetsStartView, ApplicationSendView
 from vacancies.views import ListVacanciesView, ListVacanciesBySpecialtyView
 from vacancies.views import MainView
 from vacancies.views import custom_handler404, custom_handler500
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -21,6 +23,13 @@ urlpatterns = [
     path('login/', MyLoginView.as_view(), name='login'),
     path('register/', MyRegisterView.as_view(), name='register'),
     path('logout/', LogoutView.as_view(), name='logout'),
+
+    path('vacancies/<int:pk>/send/', ApplicationSendView, name='application_send'),
+
+    path('mycompany/letsstart/', MyCompanyLetsStartView.as_view(), name='my_company_lets_start'),
+    path('mycompany/', MyCompanyUpdateView.as_view(), name='my_company'),
+    path('mycompany/create', MyCompanyCreateView.as_view(), name='my_company_create'),
+
 ]
 
 if settings.DEBUG:

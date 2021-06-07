@@ -1,7 +1,11 @@
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.db.models import Count
-from django.http import HttpResponseNotFound, HttpResponseServerError
+from django.http import HttpResponseNotFound, HttpResponseServerError, HttpResponseRedirect
 from django.shortcuts import get_object_or_404
-from django.views.generic import ListView, DetailView, TemplateView
+from django.shortcuts import redirect, reverse
+from django.views import View
+from django.views.generic import ListView, DetailView, TemplateView, UpdateView, CreateView
+from django.shortcuts import render
 
 from vacancies.models import Company, Specialty, Vacancy
 
@@ -73,6 +77,70 @@ class ListVacanciesBySpecialtyView(ListView):
         context['vacancies_title'] = self.kwargs['specialty']
 
         return context
+
+
+class ApplicationSendView(TemplateView):
+    template_name = 'vacancies/resume/send.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['vacancy_pk'] = self.kwargs['pk']
+
+        return context
+
+
+class MyCompanyLetsStartView(LoginRequiredMixin, TemplateView):
+    template_name = 'vacancies/company/company-create.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            print("Here")
+            Company.objects.get(owner=request.user)
+        except Company.DoesNotExist:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            return redirect('my_company')
+
+
+class MyCompanyUpdateView(LoginRequiredMixin, UpdateView):
+    model = Company
+    template_name = 'vacancies/company/company-edit.html'
+    fields = ['name', 'location', 'logo', 'description', 'employee_count']
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.company = self.model.objects.get(owner=self.request.user)
+        except self.model.DoesNotExist:
+            return redirect('my_company_lets_start')
+        else:
+            return super().dispatch(request, *args, **kwargs)
+
+    def get_object(self):
+        return self.company
+
+    def get_success_url(self):
+        return reverse('my_company')
+
+
+class MyCompanyCreateView(LoginRequiredMixin, CreateView):
+    model = Company
+    template_name = 'vacancies/company/company-edit.html'
+    fields = ['name', 'location', 'logo', 'description', 'employee_count']
+
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.model.objects.get(owner=request.user)
+        except Company.DoesNotExist:
+            return super().dispatch(request, *args, **kwargs)
+        else:
+            return redirect('my_company')
+
+    def form_valid(self, form):
+        form.instance.owner = self.request.user
+        return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('my_company')
 
 
 def custom_handler404(request, exception):
