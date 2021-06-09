@@ -31,7 +31,7 @@ class Migration(migrations.Migration):
                 ('written_number', models.CharField(max_length=32)),
                 ('written_cover_letter', models.TextField()),
                 ('user', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='applications', to=settings.AUTH_USER_MODEL)),
-                ('vacancy', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='applications', to='vacancy.vacancy')),
+                ('vacancy', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='applications', to='vacancies.vacancy')),
             ],
             options={
                 'verbose_name': 'Отклик',

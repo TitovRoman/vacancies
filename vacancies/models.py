@@ -17,7 +17,7 @@ class Company(models.Model):
         verbose_name_plural = 'Компании'
 
     def __str__(self):
-        return f"Company with pk={self.pk}"
+        return f"Company {self.name}"
 
 
 class Specialty(models.Model):
@@ -30,25 +30,25 @@ class Specialty(models.Model):
         verbose_name_plural = 'Специализации'
 
     def __str__(self):
-        return f"Specialty with pk={self.pk}"
+        return f"Specialty {self.title}"
 
 
 class Vacancy(models.Model):
     title = models.CharField(max_length=64)
-    specialty = models.ForeignKey(Specialty, on_delete=models.CASCADE, related_name='vacancy')
-    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='vacancy')
+    specialty = models.ForeignKey(Specialty, on_delete=models.CASCADE, related_name='vacancies')
+    company = models.ForeignKey(Company, on_delete=models.CASCADE, related_name='vacancies')
     skills = models.TextField()
     description = models.TextField()
     salary_min = models.IntegerField()
     salary_max = models.IntegerField()
-    published_at = models.DateField()
+    published_at = models.DateField(auto_now_add=True)
 
     class Meta:
         verbose_name = 'Вакансия'
         verbose_name_plural = 'Вакансии'
 
     def __str__(self):
-        return f"Vacancy with pk={self.pk}"
+        return f"Vacancy {self.title}"
 
     def clean(self):
         if self.salary_min > self.salary_max:
@@ -60,10 +60,13 @@ class Vacancy(models.Model):
 
 class Application(models.Model):
     written_username = models.CharField(max_length=64)
-    written_number = models.CharField(max_length=32)
+    written_phone = models.CharField(max_length=32)
     written_cover_letter = models.TextField()
     vacancy = models.ForeignKey(Vacancy, on_delete=models.CASCADE, related_name='applications')
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='applications')
+    user = models.ForeignKey(settings.AUTH_USER_MODEL,
+                             null=True,
+                             on_delete=models.SET_NULL,
+                             related_name='applications')
 
     class Meta:
         verbose_name = 'Отклик'
