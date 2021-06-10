@@ -110,7 +110,7 @@ class ListVacanciesBySpecialtyView(ListView):
 
 
 class ApplicationSendView(TemplateView):
-    template_name = 'vacancies/resume/send.html'
+    template_name = 'vacancies/resume/../templates/vacancies/vacancy/applicatio_send.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

@@ -6,11 +6,13 @@ from django.contrib.auth.views import LogoutView
 
 from authentication.views import MyRegisterView, MyLoginView
 from vacancies.views.public import DetailVacancyView, ApplicationSendView, VacancyWithApplicationView
-from vacancies.views.my_company import MyCompanyLetsStartView, MyCompanyUpdateView, MyCompanyCreateView, \
-    MyVacanciesView, MyVacancyCreateView, MyVacancyUpdateView
+from vacancies.views.user_profile import MyCompanyLetsStartView, MyCompanyUpdateView, MyCompanyCreateView, \
+    MyVacanciesView, MyVacancyCreateView, MyVacancyUpdateView, MyResumeLetsStartView, MyResumeUpdateView, \
+    MyResumeCreateView
 from vacancies.views.public import ListVacanciesView, ListVacanciesBySpecialtyView, ListVacanciesByCompanyView
 from vacancies.views.public import MainView
 from vacancies.views.public import custom_handler404, custom_handler500
+
 
 
 urlpatterns = [
@@ -35,7 +37,9 @@ urlpatterns = [
     path('mycompany/vacancies/create', MyVacancyCreateView.as_view(), name='my_vacancy_create'),
     path('mycompany/vacancies/<int:pk>', MyVacancyUpdateView.as_view(), name='my_vacancy_update'),
 
-
+    path('myresume/letsstart/', MyResumeLetsStartView.as_view(), name='my_resume_lets_start'),
+    path('myresume/', MyResumeUpdateView.as_view(), name='my_resume'),
+    path('myresume/create', MyResumeCreateView.as_view(), name='my_resume_create'),
 ]
 
 if settings.DEBUG:
