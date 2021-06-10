@@ -1,5 +1,5 @@
-from django.db.models import Count
-from django.http import HttpResponseNotFound, HttpResponseServerError
+from django.db.models import Count, Q
+from django.http import HttpResponseNotFound, HttpResponseServerError, Http404
 from django.shortcuts import get_object_or_404, render, redirect
 from django.views import View
 from django.views.generic import TemplateView, ListView, DetailView
@@ -10,11 +10,13 @@ from vacancies.models import Specialty, Company, Vacancy
 
 class MainView(TemplateView):
     template_name = 'vacancies/index.html'
+    search_examples = ['Python', 'Flask', 'Django', 'Парсинг', 'ML']
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['specialties'] = Specialty.objects.annotate(count=Count('vacancies')).order_by('id')
         context['companies'] = Company.objects.annotate(count=Count('vacancies')).order_by('id')
+        context['search_examples'] = self.search_examples
 
         return context
 
@@ -44,11 +46,17 @@ class DetailVacancyView(DetailView):
     template_name = 'vacancies/vacancy/vacancy.html'
     queryset = model.objects.select_related('specialty', 'company')
 
+
 class VacancyWithApplicationView(View):
     template_name = 'vacancies/vacancy/vacancy.html'
 
     def dispatch(self, request, *args, **kwargs):
-        self.vacancy = get_object_or_404(Vacancy, id=self.kwargs['pk'])
+        # try:
+        #     self.vacancy = Vacancy.objects.select_related('specialty', 'company').get(id=self.kwargs['pk'])
+        # except Vacancy.DoesNotExist:
+        #     raise Http404('No %s matches the given query.' % Vacancy._meta.object_name)
+
+        self.vacancy = get_object_or_404(Vacancy.objects.select_related('specialty', 'company'), id=self.kwargs['pk'])
 
         return super().dispatch(request, *args, **kwargs)
 
@@ -71,10 +79,6 @@ class VacancyWithApplicationView(View):
             'vacancy': self.vacancy,
             'application_form': application_form,
         })
-    # model = Vacancy
-    # context_object_name = 'vacancy'
-    #
-    # queryset = model.objects.select_related('specialty', 'company')
 
 
 class ListVacanciesView(ListView):
@@ -110,11 +114,40 @@ class ListVacanciesBySpecialtyView(ListView):
 
 
 class ApplicationSendView(TemplateView):
-    template_name = 'vacancies/resume/../templates/vacancies/vacancy/applicatio_send.html'
+    template_name = 'vacancies/vacancy/application_send.html'
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['vacancy_pk'] = self.kwargs['pk']
+
+        return context
+
+
+class VacanciesSearchView(ListView):
+    model = Vacancy
+    context_object_name = 'vacancies'
+    template_name = 'vacancies/vacancy/search.html'
+
+    def dispatch(self, request, *args, **kwargs):
+        self.search_line = self.request.GET.get('s', '')
+        return super().dispatch(request, *args, **kwargs)
+
+    def get_queryset(self):
+        return (
+            self.model.objects
+            .filter(
+                Q(title__icontains=self.search_line) |
+                Q(skills__icontains=self.search_line) |
+                Q(description__icontains=self.search_line) |
+                Q(specialty__title__icontains=self.search_line)
+            )
+            .select_related('specialty', 'company')
+        )
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['search_line'] = self.search_line
+
 
         return context
 
