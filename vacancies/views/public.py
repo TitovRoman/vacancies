@@ -51,11 +51,6 @@ class VacancyWithApplicationView(View):
     template_name = 'vacancies/vacancy/vacancy.html'
 
     def dispatch(self, request, *args, **kwargs):
-        # try:
-        #     self.vacancy = Vacancy.objects.select_related('specialty', 'company').get(id=self.kwargs['pk'])
-        # except Vacancy.DoesNotExist:
-        #     raise Http404('No %s matches the given query.' % Vacancy._meta.object_name)
-
         self.vacancy = get_object_or_404(Vacancy.objects.select_related('specialty', 'company'), id=self.kwargs['pk'])
 
         return super().dispatch(request, *args, **kwargs)
@@ -133,21 +128,20 @@ class VacanciesSearchView(ListView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
-        return (
-            self.model.objects
-            .filter(
+        if self.search_line:
+            query = (
                 Q(title__icontains=self.search_line) |
                 Q(skills__icontains=self.search_line) |
                 Q(description__icontains=self.search_line) |
                 Q(specialty__title__icontains=self.search_line)
             )
-            .select_related('specialty', 'company')
-        )
+        else:
+            query = Q()
+        return self.model.objects.filter(query).select_related('specialty', 'company')
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context['search_line'] = self.search_line
-
 
         return context
 

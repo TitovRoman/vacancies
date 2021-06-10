@@ -1,6 +1,6 @@
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
-from django.urls import reverse, reverse_lazy
+from django.urls import reverse_lazy
 from django.views.generic import TemplateView, UpdateView, CreateView, ListView
 
 from vacancies.models import Company, Vacancy, Resume
@@ -101,6 +101,7 @@ class MyVacanciesView(LoginRequiredMixin, ListView):
             self.model.objects
             .filter(company__owner=self.request.user)
             .select_related('company')
+            .prefetch_related('applications')
         )
 
 
@@ -108,6 +109,7 @@ class MyVacancyCreateView(LoginRequiredMixin, CreateView):
     model = Vacancy
     template_name = 'vacancies/user_profile/vacancy-edit.html'
     fields = ['title', 'specialty', 'skills', 'description', 'salary_min', 'salary_max']
+    success_url = reverse_lazy('my_vacancies')
 
     def dispatch(self, request, *args, **kwargs):
         try:
@@ -120,9 +122,6 @@ class MyVacancyCreateView(LoginRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.object = self.company
         return super().form_valid(form)
-
-    def get_success_url(self):
-        return reverse('my_vacancies')
 
 
 class MyVacancyUpdateView(LoginRequiredMixin, UpdateView):
@@ -142,7 +141,7 @@ class MyVacancyUpdateView(LoginRequiredMixin, UpdateView):
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(company=self.company)
+        return queryset.filter(company=self.company).prefetch_related('applications')
 
     def form_valid(self, form):
         form.instance.object = self.company
