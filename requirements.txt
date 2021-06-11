@@ -6,6 +6,7 @@ cognitive-complexity==1.2.0
 decorator==5.0.9
 Django==3.2.2
 django-crispy-forms==1.11.2
+djangorescue==0.0.4
 eradicate==2.0.0
 flake8==3.9.2
 flake8-blind-except==0.2.0
