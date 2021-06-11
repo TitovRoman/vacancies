@@ -4,6 +4,7 @@ from django import forms
 from django.contrib.auth import password_validation
 from django.contrib.auth.forms import UsernameField, AuthenticationForm
 from django.contrib.auth.models import User
+from django.core.exceptions import ValidationError
 from django.urls import reverse
 from django.utils.translation import gettext_lazy as _
 
@@ -55,6 +56,15 @@ class MyUserCreationForm(forms.ModelForm):
             'last_name',
             'password',
         )
+
+    def _post_clean(self):
+        super()._post_clean()
+        password = self.cleaned_data.get('password')
+        if password:
+            try:
+                password_validation.validate_password(password, self.instance)
+            except ValidationError as error:
+                self.add_error('password', error)
 
     def save(self, commit=True):
         user = super().save(commit=False)
