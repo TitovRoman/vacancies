@@ -16,8 +16,8 @@
               {% crispy form %}
               <!-- END Vacancy info -->
               <!-- Applications -->
-            {% url 'my_vacancy_update' as vacancy_update_url %}
-            {% if request.path != vacancy_update_url %}
+            {% url 'my_vacancy_create' as vacancy_create_url %}
+            {% if request.path != vacancy_create_url %}
               <h2 class="h4 pt-2 pb-3" id="applications">Отклики - {{ vacancy.applications.count }}</h2>
               {% for application in vacancy.applications.all %}
               <div class="card mt-3">

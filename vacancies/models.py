@@ -1,20 +1,7 @@
-from enum import Enum
-
 from django.conf import settings
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.utils.translation import gettext_lazy as _
-
-
-class SpecialtyChoices(Enum):
-    frontend = 'Фронтенд'
-    backend = 'Бэкенд'
-    gamedev = 'Геймдев'
-    devops = 'Девопс'
-    design = 'Дизайн'
-    products = 'Продукты'
-    management = 'Менеджмент'
-    testing = 'Тестирование'
 
 
 class Company(models.Model):
@@ -23,7 +10,7 @@ class Company(models.Model):
     logo = models.ImageField(upload_to=settings.MEDIA_COMPANY_IMAGE_DIR)
     description = models.TextField()
     employee_count = models.IntegerField()
-    owner = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, null=True)
+    owner = models.OneToOneField(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
 
     class Meta:
         verbose_name = 'Компания'
@@ -112,7 +99,7 @@ class Resume(models.Model):
         default=WorkStatusChoices.in_search,
     )
     salary = models.IntegerField()
-    specialty = models.OneToOneField(Specialty, on_delete=models.CASCADE)
+    specialty = models.ForeignKey(Specialty, on_delete=models.CASCADE)
     grade = models.CharField(
         max_length=32,
         choices=GradeChoices.choices,
