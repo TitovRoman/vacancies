@@ -1,4 +1,4 @@
-from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView, UpdateView, CreateView, ListView
@@ -48,8 +48,7 @@ class CompanyOrResumeUpdateView(LoginRequiredMixin, ObjectRequiredMixin, UpdateV
         context = super().get_context_data(**kwargs)
         http_referer = self.request.META.get('HTTP_REFERER')
         if (http_referer == self.request.build_absolute_uri(reverse(self.updated_url_name)) or
-            http_referer == self.request.build_absolute_uri(reverse(self.create_url_name))
-        ):
+                http_referer == self.request.build_absolute_uri(reverse(self.create_url_name))):
             context['is_updated'] = True
         else:
             context['is_updated'] = False
@@ -165,9 +164,9 @@ class MyVacancyUpdateView(LoginRequiredMixin, CompanyRequiredMixin, UpdateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         http_referer = self.request.META.get('HTTP_REFERER')
-        if (http_referer == self.request.build_absolute_uri(reverse(self.updated_url_name, kwargs={'pk': self.kwargs['pk']})) or
-            http_referer == self.request.build_absolute_uri(reverse(self.create_url_name))
-        ):
+        if (http_referer == self.request.build_absolute_uri(reverse(self.updated_url_name,
+                                                                    kwargs={'pk': self.kwargs['pk']})) or
+                http_referer == self.request.build_absolute_uri(reverse(self.create_url_name))):
             context['is_updated'] = True
         else:
             context['is_updated'] = False
@@ -175,4 +174,3 @@ class MyVacancyUpdateView(LoginRequiredMixin, CompanyRequiredMixin, UpdateView):
 
     def get_success_url(self):
         return reverse('my_vacancy_update', kwargs={'pk': self.kwargs['pk']})
-

@@ -1,10 +1,8 @@
-from crispy_forms.bootstrap import AppendedText
+from crispy_forms.helper import FormHelper
+from crispy_forms.layout import Layout, Submit, Row, Column, Div, Field
 from django import forms
-from django.urls import reverse
 
 from .models import Application, Company, Vacancy, Resume
-from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Layout, Submit, Row, Column, Div, BaseInput, Field
 
 
 class CustomImageInput(Field):
@@ -32,10 +30,10 @@ class ApplicationForm(forms.ModelForm):
                     'written_phone',
                     'written_cover_letter',
                     Submit('submit', 'Отправить отклик'),
-                    css_class='card-body mx-3'
+                    css_class='card-body mx-3',
                 ),
-                css_class='card mt-4 mb-3'
-            )
+                css_class='card mt-4 mb-3',
+            ),
         )
 
 
@@ -88,7 +86,6 @@ class VacancyForm(forms.ModelForm):
         self.fields['description'].widget.attrs = {'rows': 13}
         self.fields['salary_min'].label = 'Зарплата от'
         self.fields['salary_max'].label = 'Зарплата до'
-
 
         self.helper.layout = Layout(
             Row(

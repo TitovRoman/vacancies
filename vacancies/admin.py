@@ -14,6 +14,7 @@ class CompanyAdmin(admin.ModelAdmin):
 class ApplicationAdmin(admin.ModelAdmin):
     pass
 
+
 class ResumeAdmin(admin.ModelAdmin):
     pass
 

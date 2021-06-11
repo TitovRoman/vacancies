@@ -6,11 +6,6 @@ from django.db import models
 from django.utils.translation import gettext_lazy as _
 
 
-
-
-
-
-
 class SpecialtyChoices(Enum):
     frontend = 'Фронтенд'
     backend = 'Бэкенд'
@@ -20,9 +15,6 @@ class SpecialtyChoices(Enum):
     products = 'Продукты'
     management = 'Менеджмент'
     testing = 'Тестирование'
-
-
-
 
 
 class Company(models.Model):
@@ -130,3 +122,5 @@ class Resume(models.Model):
     experience = models.TextField()
     portfolio = models.URLField()
 
+    def __str__(self):
+        return f"Resume with pk={self.pk}"

@@ -15,6 +15,7 @@ def ru_pluralize(number, arg: str = 'ночь,ночи,ночей'):
     else:
         return f'{number} {genitive_singular}'
 
+
 @register.filter()
 def ru_pluralize_without_number(number, arg: str = 'ночь,ночи,ночей'):
     nominative_singular, genitive_singular, genitive_plural = arg.split(',')

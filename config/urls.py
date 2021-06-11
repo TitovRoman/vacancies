@@ -1,20 +1,18 @@
 from django.conf import settings
 from django.conf.urls.static import static
 from django.contrib import admin
-from django.urls import path
 from django.contrib.auth.views import LogoutView
+from django.urls import path
 
 from authentication.views import MyRegisterView, MyLoginView
-from vacancies.views.public import DetailVacancyView, ApplicationSendView, VacancyWithApplicationView, \
-    VacanciesSearchView
-from vacancies.views.user_profile import MyCompanyLetsStartView, MyCompanyUpdateView, MyCompanyCreateView, \
-    MyVacanciesView, MyVacancyCreateView, MyVacancyUpdateView, MyResumeLetsStartView, MyResumeUpdateView, \
-    MyResumeCreateView
+from vacancies.views.public import ApplicationSendView, VacancyWithApplicationView
 from vacancies.views.public import ListVacanciesView, ListVacanciesBySpecialtyView, ListVacanciesByCompanyView
 from vacancies.views.public import MainView
+from vacancies.views.public import VacanciesSearchView
 from vacancies.views.public import custom_handler404, custom_handler500
-
-
+from vacancies.views.user_profile import MyCompanyLetsStartView, MyCompanyUpdateView, MyCompanyCreateView
+from vacancies.views.user_profile import MyResumeLetsStartView, MyResumeUpdateView, MyResumeCreateView
+from vacancies.views.user_profile import MyVacanciesView, MyVacancyCreateView, MyVacancyUpdateView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -42,7 +40,7 @@ urlpatterns = [
     path('myresume/', MyResumeUpdateView.as_view(), name='my_resume'),
     path('myresume/create', MyResumeCreateView.as_view(), name='my_resume_create'),
 
-    path('search/', VacanciesSearchView.as_view(), name='vacancies_search')
+    path('search/', VacanciesSearchView.as_view(), name='vacancies_search'),
 ]
 
 if settings.DEBUG:

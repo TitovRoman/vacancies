@@ -1,12 +1,11 @@
-from django.contrib.auth import password_validation
-from django.contrib.auth.forms import UserCreationForm, UsernameField, AuthenticationForm
-from django.contrib.auth.models import User
-from django import forms
-from django.urls import reverse
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Submit, Layout, Div, HTML, Fieldset
-from crispy_forms.bootstrap import PrependedText, AppendedText, FormActions
-from django.utils.translation import gettext, gettext_lazy as _
+from crispy_forms.layout import Submit, Layout
+from django import forms
+from django.contrib.auth import password_validation
+from django.contrib.auth.forms import UsernameField, AuthenticationForm
+from django.contrib.auth.models import User
+from django.urls import reverse
+from django.utils.translation import gettext_lazy as _
 
 
 class MyAuthenticationForm(AuthenticationForm):

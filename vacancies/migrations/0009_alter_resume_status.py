@@ -13,6 +13,10 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='resume',
             name='status',
-            field=models.CharField(choices=[('Не ищу работу', 'Не ищу работу'), ('Рассматриваю предложения', 'Рассматриваю предложения'), ('Ищу работу', 'Ищу работу')], default='Ищу работу', max_length=32),
+            field=models.CharField(choices=[('Не ищу работу', 'Не ищу работу'),
+                                            ('Рассматриваю предложения', 'Рассматриваю предложения'),
+                                            ('Ищу работу', 'Ищу работу')],
+                                   default='Ищу работу',
+                                   max_length=32),
         ),
     ]
