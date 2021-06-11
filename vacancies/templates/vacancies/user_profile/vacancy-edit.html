@@ -10,7 +10,9 @@
             <!-- Tab -->
             <section>
               <h2 class="h4 pt-2 pb-3">Backend Middle/Senior</h2>
+              {% if is_updated %}
               <p class="alert alert-info" role="alert">Вакансия обновлена</p>
+              {% endif %}
               {% crispy form %}
               <!-- END Vacancy info -->
               <!-- Applications -->

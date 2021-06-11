@@ -7,7 +7,7 @@ from vacancies.forms import CompanyForm, VacancyForm, ResumeForm
 from vacancies.models import Company, Vacancy, Resume
 
 
-class ObjectNotRequiredMixin(PermissionRequiredMixin):
+class ObjectNotRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         try:
             self.model.objects.get(owner=request.user)
@@ -17,7 +17,7 @@ class ObjectNotRequiredMixin(PermissionRequiredMixin):
             return redirect(self.redirect_url)
 
 
-class ObjectRequiredMixin(PermissionRequiredMixin):
+class ObjectRequiredMixin:
     def dispatch(self, request, *args, **kwargs):
         try:
             self.object = self.model.objects.get(owner=self.request.user)
@@ -124,7 +124,7 @@ class MyVacanciesView(LoginRequiredMixin, CompanyRequiredMixin, ListView):
     def get_queryset(self):
         return (
             self.model.objects
-            .filter(company=self.object)
+            .filter(company=self.company)
             .select_related('company')
             .prefetch_related('applications')
         )
@@ -134,12 +134,14 @@ class MyVacancyCreateView(LoginRequiredMixin, CompanyRequiredMixin, CreateView):
     model = Vacancy
     template_name = 'vacancies/user_profile/vacancy-edit.html'
     form_class = VacancyForm
-    success_url = reverse_lazy('my_vacancies')
     redirect_url = 'my_company_lets_start'
 
     def form_valid(self, form):
-        form.instance.company = self.object
+        form.instance.company = self.company
         return super().form_valid(form)
+
+    def get_success_url(self):
+        return reverse('my_vacancy_update', kwargs={'pk': self.object.id})
 
 
 class MyVacancyUpdateView(LoginRequiredMixin, CompanyRequiredMixin, UpdateView):
@@ -147,15 +149,30 @@ class MyVacancyUpdateView(LoginRequiredMixin, CompanyRequiredMixin, UpdateView):
     template_name = 'vacancies/user_profile/vacancy-edit.html'
 
     form_class = VacancyForm
-    success_url = reverse_lazy('my_vacancies')
     context_object_name = 'vacancy'
     redirect_url = 'my_company_lets_start'
+    updated_url_name = 'my_vacancy_update'
+    create_url_name = 'my_vacancy_create'
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(company=self.object).prefetch_related('applications')
+        return queryset.filter(company=self.company).prefetch_related('applications')
 
     def form_valid(self, form):
-        form.instance.object = self.object
+        form.instance.object = self.company
         return super().form_valid(form)
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        http_referer = self.request.META.get('HTTP_REFERER')
+        if (http_referer == self.request.build_absolute_uri(reverse(self.updated_url_name, kwargs={'pk': self.kwargs['pk']})) or
+            http_referer == self.request.build_absolute_uri(reverse(self.create_url_name))
+        ):
+            context['is_updated'] = True
+        else:
+            context['is_updated'] = False
+        return context
+
+    def get_success_url(self):
+        return reverse('my_vacancy_update', kwargs={'pk': self.kwargs['pk']})
 
