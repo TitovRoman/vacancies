@@ -23,14 +23,15 @@
           <div style="line-height: 1.8;">
             {{ vacancy.description|safe }}
           </div>
-          <form method="post" action="{% url 'vacancy' vacancy.id %}" class="card mt-4 mb-3" enctype="multipart/form-data">
-              {% csrf_token %}
-            <div class="card-body mx-3">
-              <p class="h5 mt-3 font-weight-normal">Отозваться на вакансию</p>
-                {{ application_form|crispy }}
-              <input type="submit" class="btn btn-primary mt-4 mb-2" value="Отправить отклик">
-            </div>
-          </form>
+            {% crispy application_form %}
+{#          <form method="post" action="" class="card mt-4 mb-3" enctype="multipart/form-data">#}
+{#              {% csrf_token %}#}
+{#            <div class="card-body mx-3">#}
+{#              <p class="h5 mt-3 font-weight-normal">Отозваться на вакансию</p>#}
+{#                {{ application_form|crispy }}#}
+{#              <input type="submit" class="btn btn-primary mt-4 mb-2" value="Отправить отклик">#}
+{#            </div>#}
+{#          </form>#}
         </section>
       </div>
     </div>

@@ -1,12 +1,13 @@
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin, PermissionRequiredMixin
 from django.shortcuts import redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import TemplateView, UpdateView, CreateView, ListView
 
+from vacancies.forms import CompanyForm, VacancyForm, ResumeForm
 from vacancies.models import Company, Vacancy, Resume
 
 
-class CompanyOrResumeLetsStartView(LoginRequiredMixin, TemplateView):
+class ObjectNotRequiredMixin(PermissionRequiredMixin):
     def dispatch(self, request, *args, **kwargs):
         try:
             self.model.objects.get(owner=request.user)
@@ -14,6 +15,20 @@ class CompanyOrResumeLetsStartView(LoginRequiredMixin, TemplateView):
             return super().dispatch(request, *args, **kwargs)
         else:
             return redirect(self.redirect_url)
+
+
+class ObjectRequiredMixin(PermissionRequiredMixin):
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.object = self.model.objects.get(owner=self.request.user)
+        except self.model.DoesNotExist:
+            return redirect(self.redirect_url)
+        else:
+            return super().dispatch(request, *args, **kwargs)
+
+
+class CompanyOrResumeLetsStartView(LoginRequiredMixin, ObjectNotRequiredMixin, TemplateView):
+    pass
 
 
 class MyCompanyLetsStartView(CompanyOrResumeLetsStartView):
@@ -28,14 +43,17 @@ class MyResumeLetsStartView(CompanyOrResumeLetsStartView):
     redirect_url = 'my_resume'
 
 
-class CompanyOrResumeUpdateView(LoginRequiredMixin, UpdateView):
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.object = self.model.objects.get(owner=self.request.user)
-        except self.model.DoesNotExist:
-            return redirect(self.redirect_url)
+class CompanyOrResumeUpdateView(LoginRequiredMixin, ObjectRequiredMixin, UpdateView):
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        http_referer = self.request.META.get('HTTP_REFERER')
+        if (http_referer == self.request.build_absolute_uri(reverse(self.updated_url_name)) or
+            http_referer == self.request.build_absolute_uri(reverse(self.create_url_name))
+        ):
+            context['is_updated'] = True
         else:
-            return super().dispatch(request, *args, **kwargs)
+            context['is_updated'] = False
+        return context
 
     def get_object(self):
         return self.object
@@ -44,30 +62,26 @@ class CompanyOrResumeUpdateView(LoginRequiredMixin, UpdateView):
 class MyCompanyUpdateView(CompanyOrResumeUpdateView):
     model = Company
     template_name = 'vacancies/user_profile/company-edit.html'
-    fields = ['name', 'location', 'logo', 'description', 'employee_count']
+    form_class = CompanyForm
 
     success_url = reverse_lazy('my_company')
     redirect_url = 'my_company_lets_start'
+    updated_url_name = 'my_company'
+    create_url_name = 'my_company_create'
 
 
 class MyResumeUpdateView(CompanyOrResumeUpdateView):
     model = Resume
     template_name = 'vacancies/user_profile/resume-edit.html'
-    fields = ['name', 'surname', 'status', 'salary', 'specialty', 'grade', 'education', 'experience', 'portfolio']
+    form_class = ResumeForm
 
     success_url = reverse_lazy('my_resume')
     redirect_url = 'my_resume_lets_start'
+    updated_url_name = 'my_resume'
+    create_url_name = 'my_resume_create'
 
 
-class CompanyOrResumeCreateView(LoginRequiredMixin, CreateView):
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.model.objects.get(owner=request.user)
-        except self.model.DoesNotExist:
-            return super().dispatch(request, *args, **kwargs)
-        else:
-            return redirect(self.redirect_url)
-
+class CompanyOrResumeCreateView(LoginRequiredMixin, ObjectNotRequiredMixin, CreateView):
     def form_valid(self, form):
         form.instance.owner = self.request.user
         return super().form_valid(form)
@@ -76,7 +90,7 @@ class CompanyOrResumeCreateView(LoginRequiredMixin, CreateView):
 class MyCompanyCreateView(CompanyOrResumeCreateView):
     model = Company
     template_name = 'vacancies/user_profile/company-edit.html'
-    fields = ['name', 'location', 'logo', 'description', 'employee_count']
+    form_class = CompanyForm
 
     success_url = reverse_lazy('my_company')
     redirect_url = 'my_company'
@@ -85,65 +99,63 @@ class MyCompanyCreateView(CompanyOrResumeCreateView):
 class MyResumeCreateView(CompanyOrResumeCreateView):
     model = Resume
     template_name = 'vacancies/user_profile/resume-edit.html'
-    fields = ['name', 'surname', 'status', 'salary', 'specialty', 'grade', 'education', 'experience', 'portfolio']
+    form_class = ResumeForm
 
     success_url = reverse_lazy('my_resume')
     redirect_url = 'my_resume'
 
 
-class MyVacanciesView(LoginRequiredMixin, ListView):
+class CompanyRequiredMixin:
+    def dispatch(self, request, *args, **kwargs):
+        try:
+            self.company = Company.objects.get(owner=self.request.user)
+        except Company.DoesNotExist:
+            return redirect(self.redirect_url)
+        else:
+            return super().dispatch(request, *args, **kwargs)
+
+
+class MyVacanciesView(LoginRequiredMixin, CompanyRequiredMixin, ListView):
     model = Vacancy
     context_object_name = 'vacancies'
     template_name = 'vacancies/user_profile/vacancy-list.html'
+    redirect_url = 'my_company_lets_start'
 
     def get_queryset(self):
         return (
             self.model.objects
-            .filter(company__owner=self.request.user)
+            .filter(company=self.object)
             .select_related('company')
             .prefetch_related('applications')
         )
 
 
-class MyVacancyCreateView(LoginRequiredMixin, CreateView):
+class MyVacancyCreateView(LoginRequiredMixin, CompanyRequiredMixin, CreateView):
     model = Vacancy
     template_name = 'vacancies/user_profile/vacancy-edit.html'
-    fields = ['title', 'specialty', 'skills', 'description', 'salary_min', 'salary_max']
+    form_class = VacancyForm
     success_url = reverse_lazy('my_vacancies')
-
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.company = Company.objects.get(owner=self.request.user)
-        except self.model.DoesNotExist:
-            return redirect('my_company_lets_start')
-        else:
-            return super().dispatch(request, *args, **kwargs)
+    redirect_url = 'my_company_lets_start'
 
     def form_valid(self, form):
-        form.instance.object = self.company
+        form.instance.company = self.object
         return super().form_valid(form)
 
 
-class MyVacancyUpdateView(LoginRequiredMixin, UpdateView):
+class MyVacancyUpdateView(LoginRequiredMixin, CompanyRequiredMixin, UpdateView):
     model = Vacancy
     template_name = 'vacancies/user_profile/vacancy-edit.html'
-    fields = ['title', 'specialty', 'skills', 'description', 'salary_min', 'salary_max']
+
+    form_class = VacancyForm
     success_url = reverse_lazy('my_vacancies')
     context_object_name = 'vacancy'
-
-    def dispatch(self, request, *args, **kwargs):
-        try:
-            self.company = Company.objects.get(owner=self.request.user)
-        except self.model.DoesNotExist:
-            return redirect('my_company_lets_start')
-        else:
-            return super().dispatch(request, *args, **kwargs)
+    redirect_url = 'my_company_lets_start'
 
     def get_queryset(self):
         queryset = super().get_queryset()
-        return queryset.filter(company=self.company).prefetch_related('applications')
+        return queryset.filter(company=self.object).prefetch_related('applications')
 
     def form_valid(self, form):
-        form.instance.object = self.company
+        form.instance.object = self.object
         return super().form_valid(form)
 

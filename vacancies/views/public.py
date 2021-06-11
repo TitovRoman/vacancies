@@ -124,7 +124,7 @@ class VacanciesSearchView(ListView):
     template_name = 'vacancies/vacancy/search.html'
 
     def dispatch(self, request, *args, **kwargs):
-        self.search_line = self.request.GET.get('s', '')
+        self.search_line = self.request.GET.get('s', '').strip()
         return super().dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
